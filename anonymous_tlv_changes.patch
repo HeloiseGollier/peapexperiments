@@ -1,0 +1,69 @@
+diff -r wpa_supplicant-2.10/.idea/workspace.xml anonymouswpasupplicant/.idea/workspace.xml
+10,11c10
+<     <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexRemoved" />
+<     <option name="/Default/Environment/Hierarchy/GeneratedFilesCacheKey/Timestamp/@EntryValue" value="4" type="long" />
+---
+>     <option name="/Default/Environment/Hierarchy/GeneratedFilesCacheKey/Timestamp/@EntryValue" value="3" type="long" />
+22c21
+<     <list default="true" id="d6200525-5854-4f98-ac45-726dda3171bb" name="Changes" comment="" />
+---
+>     <list default="true" id="6881cd14-7eaf-4c2f-b413-0a6ebcae8fac" name="Changes" comment="" />
+32c31
+<   &quot;associatedIndex&quot;: 0
+---
+>   &quot;associatedIndex&quot;: 8
+34c33
+<   <component name="ProjectId" id="3K3EqgweHVAgzxIEcsmV2YMegOK" />
+---
+>   <component name="ProjectId" id="3K3Df4CLt7TmXm41OiMS1Yb5Uve" />
+59,60c58,59
+<       <changelist id="d6200525-5854-4f98-ac45-726dda3171bb" name="Changes" comment="" />
+<       <created>1790778043134</created>
+---
+>       <changelist id="6881cd14-7eaf-4c2f-b413-0a6ebcae8fac" name="Changes" comment="" />
+>       <created>1790777457983</created>
+63,65c62,66
+<       <updated>1790778043134</updated>
+<       <workItem from="1790778044183" duration="521000" />
+<       <workItem from="1790780109400" duration="985000" />
+---
+>       <updated>1790777457983</updated>
+>       <workItem from="1790777459092" duration="584000" />
+>       <workItem from="1790778053098" duration="1172000" />
+>       <workItem from="1790780086991" duration="21000" />
+>       <workItem from="1790780273497" duration="1528000" />
+Only in anonymouswpasupplicant/.idea: wpa_supplicant-2.10.iml
+diff -r wpa_supplicant-2.10/src/eap_common/eap_tlv_common.h anonymouswpasupplicant/src/eap_common/eap_tlv_common.h
+30a31
+> #define EAP_TLV_ANONYMOUS_TLV 21
+99a101,106
+> } STRUCT_PACKED;
+> 
+> struct eap_tlv_anonymous_tlv {
+> 	be16 tlv_type;
+> 	be16 length;
+> 	be16 identity;
+diff -r wpa_supplicant-2.10/src/eap_peer/eap_peap.c anonymouswpasupplicant/src/eap_peer/eap_peap.c
+478,479c478,479
+< 	const u8 *result_tlv = NULL, *crypto_tlv = NULL;
+< 	size_t result_tlv_len = 0, crypto_tlv_len = 0;
+---
+> 	const u8 *result_tlv = NULL, *crypto_tlv = NULL, *anonymous_tlv = NULL;
+> 	size_t result_tlv_len = 0, crypto_tlv_len = 0, anonymous_tlv_len = 0;
+509a510,517
+> 		case EAP_TLV_ANONYMOUS_TLV:
+> 			anonymous_tlv = pos;
+> 			anonymous_tlv_len = tlv_len;
+> 			wpa_printf(MSG_DEBUG, "EAP-TLV: identified anonymous TLV Type "
+> 				   "%d%s", tlv_type,
+> 				   mandatory ? " (mandatory)" : "");
+> 			break;
+> 
+549a558,563
+> 	}
+> 
+> 	if (anonymous_tlv) {
+> 		wpa_hexdump(MSG_INFO, "EAP-TLV: Anonymous TLV",
+> 			   anonymous_tlv, anonymous_tlv_len);
+> 		eap_set_anon_id(sm, anonymous_tlv, anonymous_tlv_len);
+Only in anonymouswpasupplicant/wpa_supplicant: .config

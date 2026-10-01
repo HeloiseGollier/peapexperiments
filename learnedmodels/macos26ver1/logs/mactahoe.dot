@@ -1,0 +1,56 @@
+digraph g {
+__start0 [label="" shape="none"];
+
+	s0 [shape="circle" label="0"];
+	s1 [shape="circle" label="1"];
+	s2 [shape="circle" label="2"];
+	s4 [shape="circle" label="3"];
+	s5 [shape="circle" label="4"];
+	s6 [shape="circle" label="5"];
+	s7 [shape="circle" label="6"];
+	s8 [shape="circle" label="7"];
+	s9 [shape="circle" label="8"];
+	s10 [shape="circle" label="9"];
+	s11 [shape="circle" label="10"];
+	s0 -> s0 [label=<<FONT COLOR="forestgreen">id_request_v1 / id_response_v1</FONT><BR/> inner_success / ack<BR/>inner_failure / ack>color="forestgreen"];
+	s0 -> s1 [label="challenge_v1 / challenge_response_v1"color="forestgreen"fontcolor="forestgreen"];
+	s0 -> s2 [label="other / no_reply"];
+	s1 -> s1 [label="id_request_v1 / id_response_v1\nchallenge_v1 / challenge_response_v1\ninner_success / ack\ninner_failure / ack"];
+	s1 -> s2 [label="other / no_reply"];
+	s1 -> s4 [label="success_request_v1 / success_response_v1"color="forestgreen"fontcolor="forestgreen"];
+	s2 -> s2 [label="any / -"];
+	s4 -> s4 [label=<id_request_v1 / id_response_v1<BR/>success_request_v1 / success_response_v1<BR/><FONT COLOR="forestgreen">inner_success / ack</FONT><BR/> >color="forestgreen"];
+	s4 -> s9 [label="challenge_v1 / challenge_response_v1"];
+	s4 -> s2 [label="success_request_null_v1 / no_reply\n4_way_message_1 / 4_way_message_2"];
+	s4 -> s5 [label="inner_failure / ack"];
+	s4 -> s7 [label="eap_success / no_reply"color="forestgreen"fontcolor="forestgreen"];
+	s5 -> s5 [label="id_request_v1 / id_response_v1\ninner_failure / ack"];
+	s5 -> s8 [label="challenge_v1 / challenge_response_v1"];
+	s5 -> s4 [label="success_request_v1 / success_response_v1\ninner_success / ack"];
+	s5 -> s2 [label="4_way_message_1 / 4_way_message_2\nother / no_reply"];
+	s6 -> s6 [label="id_request_v1 / id_response_v1\ninner_failure / ack\neap_success / no_reply"];
+	s6 -> s10 [label="challenge_v1 / challenge_response_v1"];
+	s6 -> s2 [label="success_request_null_v1 / no_reply\n4_way_message_1 / no_reply"];
+	s6 -> s7 [label="success_request_v1 / success_response_v1\ninner_success / ack"];
+	s7 -> s7 [label="id_request_v1 / id_response_v1\nsuccess_request_v1 / success_response_v1\ninner_success / ack\neap_success / no_reply"];
+	s7 -> s11 [label="challenge_v1 / challenge_response_v1"];
+	s7 -> s2 [label=<success_request_null_v1 / no_reply<BR/><FONT COLOR="forestgreen">4_way_message_1 / 4_way_message_2</FONT>>color="forestgreen"];
+	s7 -> s6 [label="inner_failure / ack"];
+	s8 -> s8 [label="id_request_v1 / id_response_v1\nchallenge_v1 / challenge_response_v1\ninner_success / ack\ninner_failure / ack"];
+	s8 -> s4 [label="success_request_v1 / success_response_v1"];
+	s8 -> s2 [label="4_way_message_1 / 4_way_message_2\nother / no_reply"];
+	s9 -> s9 [label="id_request_v1 / id_response_v1\nchallenge_v1 / challenge_response_v1\ninner_success / ack"];
+	s9 -> s4 [label="success_request_v1 / success_response_v1"];
+	s9 -> s8 [label="inner_failure / ack"];
+	s9 -> s11 [label="eap_success / no_reply"];
+	s9 -> s2 [label="success_request_null_v1 / no_reply\n4_way_message_1 / 4_way_message_2"];
+	s10 -> s10 [label="id_request_v1 / id_response_v1\nchallenge_v1 / challenge_response_v1\ninner_success / ack\ninner_failure / ack\neap_success / no_reply"];
+	s10 -> s2 [label="success_request_null_v1 / no_reply\n4_way_message_1 / no_reply"];
+	s10 -> s7 [label="success_request_v1 / success_response_v1"];
+	s11 -> s11 [label="id_request_v1 / id_response_v1\nchallenge_v1 / challenge_response_v1\ninner_success / ack\neap_success / no_reply"];
+	s11 -> s7 [label="success_request_v1 / success_response_v1"];
+	s11 -> s10 [label="inner_failure / ack"];
+	s11 -> s2 [label="success_request_null_v1 / no_reply\n4_way_message_1 / 4_way_message_2"];
+
+__start0 -> s0;
+}

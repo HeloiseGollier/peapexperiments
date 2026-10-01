@@ -1,0 +1,21 @@
+Dec 18, 2025 1:06:45 PM nl.cypherpunk.statelearner.Learner <init>
+INFO: Using socket SUL
+Dec 18, 2025 1:06:56 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Using learning algorithm ExtensibleLStarMealy
+Dec 18, 2025 1:06:56 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Using equivalence algorithm MealyModifiedWMethodEQOracle
+Dec 18, 2025 1:06:56 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Starting learning
+Dec 18, 2025 1:06:56 PM de.learnlib.logging.LearnLogger logPhase
+INFO: Starting round 1
+Dec 18, 2025 1:24:55 PM nl.cypherpunk.statelearner.Learner learn
+INFO: -------------------------------------------------------
+Dec 18, 2025 1:24:55 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Learning [ms]: 285415, (285.415 s)
+Searching for counter-example [ms]: 792823, (792.823 s)
+Total time [ms]: 1078334, (1078.334 s)
+
+Dec 18, 2025 1:24:55 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Rounds []: 1
+Dec 18, 2025 1:24:55 PM nl.cypherpunk.statelearner.Learner learn
+INFO: States in final hypothesis: 6

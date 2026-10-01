@@ -1,0 +1,12 @@
+# Phase 1 users
+#"user" PWD "password"
+#"peapuser" PEAP
+
+# Wildcard for all other identities
+* PEAP
+# Phase 2 (tunnelled within EAP-PEAP or EAP-TTLS) users
+#"puser" PEAP [ver=0]
+"user" MSCHAPV2 "password"	[2]
+
+# Default to EAP-SIM and EAP-AKA based on fixed identity prefixes in phase 2
+

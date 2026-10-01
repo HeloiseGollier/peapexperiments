@@ -1,0 +1,28 @@
+digraph g {
+__start0 [label="" shape="none"];
+
+	s0 [shape="circle" label="0"];
+	s1 [shape="circle" label="1"];
+	s2 [shape="circle" label="6"];
+	s4 [shape="circle" label="2"];
+	s5 [shape="circle" label="3"];
+	s6 [shape="circle" label="5"];
+	s7 [shape="circle" label="4"];
+	s0 -> s1 [label="id_request / id_response"color="forestgreen"fontcolor="forestgreen"];
+	s0 -> s2 [label="other / -"];
+	s1 -> s1 [label="id_request / nak"];
+	s1 -> s4 [label="challenge / challenge_response"color="forestgreen"fontcolor="forestgreen"];
+	s1 -> s2 [label="other / -"];
+	s2 -> s2 [label="any / -"];
+	s4 -> s2 [label="other / -"];
+	s4 -> s5 [label="success_request / success_response"color="forestgreen"fontcolor="forestgreen"];
+	s5 -> s2 [label="other / -"];
+	s5 -> s7 [label="tlv_success / tlv_success \n tlv_success_and_cryptobinding / tlv_success_and_cryptobinding"color="forestgreen"fontcolor="forestgreen"];
+	s6 -> s2 [label="other / -"];
+	s6 -> s2 [label="4_way_message_1 / 4_way_message_2"color="forestgreen"fontcolor="forestgreen"];
+	s6 -> s6 [label="eap_success / no_reply_after_eap_success"];
+	s7 -> s2 [label="other / -"];
+	s7 -> s6 [label="eap_success / no_reply_after_eap_success"color="forestgreen"fontcolor="forestgreen"];
+
+__start0 -> s0;
+}

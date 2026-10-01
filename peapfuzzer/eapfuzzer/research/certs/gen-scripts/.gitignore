@@ -1,0 +1,10 @@
+*.pem
+*.der
+*.key
+*.crt
+*.csr
+*.p12
+*.txt*
+dh
+passwords.mk
+serial*

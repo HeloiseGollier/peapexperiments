@@ -1,0 +1,51 @@
+digraph g {
+__start0 [label="" shape="none"];
+
+	s0 [shape="circle" label="0"];
+	s1 [shape="circle" label="1"];
+	s2 [shape="circle" label="2"];
+	s3 [shape="circle" label="3"];
+	s4 [shape="circle" label="4"];
+	s0 -> s0 [label="id_request_v1 / id_response_v1"];
+	s0 -> s1 [label="challenge_v1 / challenge_response_v1"];
+	s0 -> s2 [label="success_request_all_zeros_v1 / no_reply"];
+	s0 -> s2 [label="success_request_with_credentials_v1 / no_reply"];
+	s0 -> s2 [label="inner_success / deauthentication"];
+	s0 -> s2 [label="inner_failure / inner_failure_response"];
+	s0 -> s2 [label="eap_success / deauthentication"];
+	s0 -> s2 [label="4_way_message_1 / deauthentication"];
+	s1 -> s1 [label="id_request_v1 / id_response_v1"];
+	s1 -> s1 [label="challenge_v1 / challenge_response_v1"];
+	s1 -> s2 [label="success_request_all_zeros_v1 / no_reply"];
+	s1 -> s3 [label="success_request_with_credentials_v1 / success_response_v1"];
+	s1 -> s2 [label="inner_success / deauthentication"];
+	s1 -> s2 [label="inner_failure / inner_failure_response"];
+	s1 -> s2 [label="eap_success / deauthentication"];
+	s1 -> s2 [label="4_way_message_1 / deauthentication"];
+	s2 -> s2 [label="id_request_v1 / -"];
+	s2 -> s2 [label="challenge_v1 / -"];
+	s2 -> s2 [label="success_request_all_zeros_v1 / -"];
+	s2 -> s2 [label="success_request_with_credentials_v1 / -"];
+	s2 -> s2 [label="inner_success / -"];
+	s2 -> s2 [label="inner_failure / -"];
+	s2 -> s2 [label="eap_success / -"];
+	s2 -> s2 [label="4_way_message_1 / -"];
+	s3 -> s3 [label="id_request_v1 / id_response_v1"];
+	s3 -> s3 [label="challenge_v1 / challenge_response_v1"];
+	s3 -> s2 [label="success_request_all_zeros_v1 / no_reply"];
+	s3 -> s3 [label="success_request_with_credentials_v1 / success_response_v1"];
+	s3 -> s4 [label="inner_success / empty_peap"];
+	s3 -> s2 [label="inner_failure / inner_failure_response"];
+	s3 -> s2 [label="eap_success / deauthentication"];
+	s3 -> s2 [label="4_way_message_1 / deauthentication"];
+	s4 -> s2 [label="id_request_v1 / no_reply"];
+	s4 -> s2 [label="challenge_v1 / no_reply"];
+	s4 -> s2 [label="success_request_all_zeros_v1 / no_reply"];
+	s4 -> s2 [label="success_request_with_credentials_v1 / no_reply"];
+	s4 -> s2 [label="inner_success / no_reply"];
+	s4 -> s2 [label="inner_failure / no_reply"];
+	s4 -> s4 [label="eap_success / after_eap_success"];
+	s4 -> s2 [label="4_way_message_1 / 4_way_message_2"];
+
+__start0 -> s0;
+}

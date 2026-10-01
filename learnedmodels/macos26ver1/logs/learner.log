@@ -1,0 +1,37 @@
+Mar 31, 2026 9:35:42 AM nl.cypherpunk.statelearner.Learner <init>
+INFO: Using socket SUL
+Mar 31, 2026 9:36:33 AM nl.cypherpunk.statelearner.Learner learn
+INFO: Using learning algorithm ExtensibleLStarMealy
+Mar 31, 2026 9:36:33 AM nl.cypherpunk.statelearner.Learner learn
+INFO: Using equivalence algorithm MealyModifiedWMethodEQOracle
+Mar 31, 2026 9:36:33 AM nl.cypherpunk.statelearner.Learner learn
+INFO: Starting learning
+Mar 31, 2026 9:36:33 AM de.learnlib.logging.LearnLogger logPhase
+INFO: Starting round 1
+Mar 31, 2026 9:36:33 AM de.learnlib.logging.LearnLogger logCounterexample
+INFO: Counter-example found: Query[ε|challenge_v1 success_request_with_credentials_v1 inner_failure eap_success success_request_with_credentials_v1 / challenge_response_v1 success_response_v1 empty_peap after_eap_success no_reply]
+Mar 31, 2026 9:36:33 AM de.learnlib.logging.LearnLogger logPhase
+INFO: Starting round 2
+Mar 31, 2026 9:36:57 AM de.learnlib.logging.LearnLogger logCounterexample
+INFO: Counter-example found: Query[ε|challenge_v1 success_request_with_credentials_v1 eap_success inner_failure 4_way_message_1 / challenge_response_v1 success_response_v1 after_eap_success empty_peap no_reply]
+Mar 31, 2026 9:36:57 AM de.learnlib.logging.LearnLogger logPhase
+INFO: Starting round 3
+Mar 31, 2026 9:37:02 AM de.learnlib.logging.LearnLogger logCounterexample
+INFO: Counter-example found: Query[ε|challenge_v1 success_request_with_credentials_v1 challenge_v1 inner_failure inner_success eap_success id_request_v1 / challenge_response_v1 success_response_v1 challenge_response_v1 empty_peap empty_peap after_eap_success no_reply]
+Mar 31, 2026 9:37:02 AM de.learnlib.logging.LearnLogger logPhase
+INFO: Starting round 4
+Mar 31, 2026 9:37:07 AM de.learnlib.logging.LearnLogger logCounterexample
+INFO: Counter-example found: Query[ε|challenge_v1 success_request_with_credentials_v1 challenge_v1 eap_success inner_failure inner_success 4_way_message_1 / challenge_response_v1 success_response_v1 challenge_response_v1 after_eap_success empty_peap empty_peap no_reply]
+Mar 31, 2026 9:37:07 AM de.learnlib.logging.LearnLogger logPhase
+INFO: Starting round 5
+Mar 31, 2026 11:13:52 AM nl.cypherpunk.statelearner.Learner learn
+INFO: -------------------------------------------------------
+Mar 31, 2026 11:13:52 AM nl.cypherpunk.statelearner.Learner learn
+INFO: Learning [ms]: 1491, (1.491 s)
+Searching for counter-example [ms]: 5838124, (5838.124 s)
+Total time [ms]: 5839804, (5839.804 s)
+
+Mar 31, 2026 11:13:52 AM nl.cypherpunk.statelearner.Learner learn
+INFO: Rounds []: 5
+Mar 31, 2026 11:13:52 AM nl.cypherpunk.statelearner.Learner learn
+INFO: States in final hypothesis: 12

@@ -1,0 +1,23 @@
+digraph g {
+__start0 [label="" shape="none"];
+
+	s0 [shape="circle" label="0"];
+	s1 [shape="circle" label="1"];
+	s2 [shape="circle" label="2"];
+	s3 [shape="circle" label="3"];
+	s4 [shape="circle" label="4"];
+	s0 -> s0 [label="id_request_v1 / id_response_v1"color="forestgreen"fontcolor="forestgreen"];
+	s0 -> s1 [label="challenge_v1 / challenge_response_v1"color="forestgreen"fontcolor="forestgreen"];
+	s0 -> s2 [label="success_request_null_v1 / no_reply\nsuccess_request_v1 / no_reply\ninner_failure / inner_failure\nother / deauthentication"];
+	s1 -> s1 [label="id_request_v1 / id_response_v1\nchallenge_v1 / challenge_response_v1"];
+	s1 -> s2 [label="success_request_null_v1 / no_reply\ninner_failure / inner_failure\nother / deauthentication"];
+	s1 -> s3 [label="success_request_v1 / success_response_v1"color="forestgreen"fontcolor="forestgreen"];
+	s2 -> s2 [label="any / -"];
+	s3 -> s3 [label="id_request_v1 / id_response_v1\nchallenge_v1 / challenge_response_v1\nsuccess_request_v1 / success_response_v1"];
+	s3 -> s2 [label="success_request_null_v1 / no_reply\ninner_failure / inner_failure\nother / deauthentication"];
+	s3 -> s4 [label="inner_success / empty_peap"color="forestgreen"fontcolor="forestgreen"];
+	s4 -> s2 [label=<<FONT COLOR="forestgreen">4_way_message_1 / 4_way_message_2</FONT><BR/> other / no_reply>color="forestgreen"];
+	s4 -> s4 [label="eap_success / no_reply"color="forestgreen"fontcolor="forestgreen"];
+
+__start0 -> s0;
+}

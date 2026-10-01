@@ -1,0 +1,24 @@
+digraph g {
+__start0 [label="" shape="none"];
+
+	s0 [shape="circle" label="0"];
+	s1 [shape="circle" label="1"color="forestgreen"fontcolor="forestgreen"];
+	s2 [shape="circle" label="2"color="red"fontcolor="red"];
+	s3 [shape="circle" label="3"];
+	s5 [shape="circle" label="4"];
+	s0 -> s0 [label="id_request / id_response"color="forestgreen"fontcolor="forestgreen"];
+	s0 -> s1 [label="challenge / challenge_response"color="forestgreen"fontcolor="forestgreen"];
+	s0 -> s2 [label="tlv_success / tlv_success \n success_and_cryptobinding / tlv_success"color="red"fontcolor="red"];
+	s0 -> s3 [label="other / -"];
+	s1 -> s1 [label="id_request / id_response \n challenge / challenge_response"];
+	s1 -> s5 [label=<<FONT COLOR="forestgreen">success_request / success_response</FONT> <BR/> <FONT COLOR="red">tlv_success / tlv_success <BR/> success_and_cryptobinding / tlv_success</FONT>>];
+	s1 -> s3 [label="other / -"];
+	s2 -> s2 [label=<id_request / id_response<BR/> <FONT COLOR="red">tlv_success / tlv_success</FONT> <BR/> <FONT COLOR="red">tlv_success_and_cryptobinding / tlv_success</FONT> <BR/> eap_success / no_reply>color="red"];
+	s2 -> s5 [label="challenge / challenge_response"];
+	s2 -> s3 [label=<<FONT COLOR="red">4_way_message_1 / 4_way_message_2</FONT><BR/> other / ->color="red"];
+	s3 -> s3 [label="any / -"];
+	s5 -> s5 [label=<id_request / id_response<BR/> challenge / challenge_response<BR/> success_request_with_credentials / success_response<BR/> <FONT COLOR="forestgreen">tlv_success / tlv_success</FONT><BR/> tlv_success_and_cryptobinding / tlv_success<BR/><FONT COLOR="forestgreen">eap_success / after_eap_success</FONT>>color="forestgreen"];
+	s5 -> s3 [label=<<FONT COLOR="forestgreen">4_way_message_1 / 4_way_message_2</FONT><BR/> other / ->color="forestgreen"];
+
+__start0 -> s0;
+}

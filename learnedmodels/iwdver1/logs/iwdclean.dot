@@ -1,0 +1,33 @@
+digraph g {
+__start0 [label="" shape="none"];
+
+	s0 [shape="circle" label="0"];
+	s1 [shape="circle" label="1"];
+	s2 [shape="circle" label="2"];
+	s3 [shape="circle" label="3"];
+	s4 [shape="circle" label="4"];
+	s5 [shape="circle" label="5"];
+	s6 [shape="circle" label="6"];
+	s0 -> s1 [label=<<FONT COLOR="forestgreen">id_request_v1 / id_response_v1</FONT><BR/> challenge_v1 / challenge_response_v1>color="forestgreen"];
+	s0 -> s2 [label="success_request_null_v1 / encrypted_alert\nother / no_reply"];
+	s0 -> s3 [label="success_request_v1 / success_response_v1"color="orange"fontcolor="orange"];
+	s0 -> s0 [label="eap_success / no_reply"];
+	s1 -> s1 [label=<id_request_v1 / id_response_v1<BR/><FONT COLOR="forestgreen">challenge_v1 / challenge_response_v1</FONT>>color="forestgreen"];
+	s1 -> s2 [label="success_request_null_v1 / encrypted_alert\ninner_success / no_reply\ninner_failure / encrypted_alert\n4_way_message_1 / no_reply"];
+	s1 -> s3 [label="success_request_v1 / success_response_v1"color="forestgreen"fontcolor="forestgreen"];
+	s1 -> s0 [label="eap_success / no_reply"];
+	s2 -> s2 [label="any / -"];
+	s3 -> s3 [label="id_request_v1 / id_response_v1\nchallenge_v1 / challenge_response_v1\nsuccess_request_v1 / success_response_v1"];
+	s3 -> s2 [label="success_request_null_v1 / encrypted_alert\ninner_failure / no_reply\n4_way_message_1 / no_reply"];
+	s3 -> s4 [label="inner_success / ack"color="forestgreen"fontcolor="forestgreen"];
+	s3 -> s6 [label="eap_success / no_reply"];
+	s4 -> s2 [label="4_way_message_1 / 4_way_message_2\nother / no_reply"];
+	s4 -> s5 [label="eap_success / no_reply"color="forestgreen"fontcolor="forestgreen"];
+	s5 -> s2 [label=<<FONT COLOR="forestgreen">4_way_message_1 / 4_way_message_2</FONT><BR/> other / deauthentication>color="forestgreen"];
+	s5 -> s5 [label="eap_success / no_reply"];
+	s6 -> s3 [label="id_request_v1 / id_response_v1\nchallenge_v1 / challenge_response_v1\nsuccess_request_v1 / success_response_v1"];
+	s6 -> s2 [label="success_request_null_v1 / encrypted_alert\nother / no_reply"];
+	s6 -> s6 [label="eap_success / no_reply"];
+
+__start0 -> s0;
+}

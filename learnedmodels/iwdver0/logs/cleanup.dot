@@ -1,0 +1,46 @@
+digraph g {
+    //node [shape=circle, fontsize=12, fixedsize=true, width=0.6];
+    //edge [fontsize=10];
+//rankdir=LR;
+
+__start0 [label="" shape="none"];
+
+	s0 [shape="circle" label="0"];
+	s1 [shape="circle" label="1"];
+	s2 [shape="circle" label="2"];
+	s3 [shape="circle" label="3"];
+	s4 [shape="circle" label="4"];
+	s5 [shape="circle" label="5"];
+	s6 [shape="circle" label="6"];
+	s7 [shape="circle" label="7"];
+	#{ rank=same; s0;s1;s4;s5;s6 }
+	s0 -> s0 [label=<<FONT COLOR="forestgreen">id_request / id_response</FONT><BR/>eap_success / no_reply_after_eap_success> color="forestgreen"];
+	s0 -> s1 [label="challenge / challenge_response" color="forestgreen"fontcolor="forestgreen"];
+	s0 -> s2 [label="other /\n encrypted_alert"];
+	s0 -> s3 [label="success_request_with_credentials / success_response"color="orange"fontcolor="orange"];
+	s1 -> s1 [label="id_request / id_response \n challenge / challenge_response \n eap_success / no_reply_after_eap_success"];
+	s1 -> s2 [label="other / encrypted_alert"];
+	s1 -> s4 [label="success_request_with_credentials / success_response" color="forestgreen" fontcolor="forestgreen"];
+	s2 -> s2 [label="any / -"];
+	s3 -> s3 [label="id_request / id_response \n success_request_with_credentials / success_response \n eap_success / no_reply_after_eap_success"];
+	s3 -> s7 [label="challenge / challenge_response"];
+	s3 -> s5 [label="tlv_success / tlv_success"];
+	s3 -> s2 [label="other / encrypted_alert"];
+	s4 -> s4 [label="id_request / id_response \n success_request_with_credentials / success_response \n eap_success / no_reply_after_eap_success"];
+	s4 -> s7 [label="challenge /\n challenge_response"];
+	s4 -> s5 [label="tlv_success / tlv_success \n tlv_success_and_cryptobinding / tlv_success_and_cryptobinding"color="forestgreen" fontcolor="forestgreen"];
+	s4 -> s2 [label="other / tlv_failure"];
+	s5 -> s2 [label="other / no_reply"];
+	s5 -> s6 [label="eap_success / no_reply_after_eap_success"color="forestgreen"];
+	s5 -> s2 [label="4_way_message_1 / 4_way_message_2"];
+	s6 -> s2 [label="other / deauthentication"];
+	s6 -> s6 [label="eap_success / no_reply_after_eap_success"];
+	s6 -> s2 [label="4_way_message_1 / 4_way_message_2"color="forestgreen"fontcolor="forestgreen"];
+	s7 -> s7 [label="id_request / id_response \n challenge / challenge_response \n eap_success / no_reply_after_eap_success"];
+	s7 -> s5 [label="tlv_success / tlv_success"];
+	s7 -> s2 [label="other / encrypted_alert"];
+	s7 -> s4 [label="success_request_with_credentials /\n success_response"];
+	//s7 -> s2 [label="tlv_success_and_cryptobinding / no_reply"];
+
+__start0 -> s0;
+}

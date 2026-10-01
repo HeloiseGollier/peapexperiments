@@ -1,0 +1,25 @@
+Aug 13, 2025 3:09:59 PM nl.cypherpunk.statelearner.Learner <init>
+INFO: Using socket SUL
+Aug 13, 2025 3:10:06 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Using learning algorithm ExtensibleLStarMealy
+Aug 13, 2025 3:10:06 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Using equivalence algorithm MealyModifiedWMethodEQOracle
+Aug 13, 2025 3:10:06 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Starting learning
+Aug 13, 2025 3:10:06 PM de.learnlib.logging.LearnLogger logPhase
+INFO: Starting round 1
+Aug 13, 2025 3:14:04 PM de.learnlib.logging.LearnLogger logCounterexample
+INFO: Counter-example found: Query[ε|id_request_v0 challenge_v0 success_request_with_credentials tlv_request eap_success 4_way_message_1 / id_response_v0 challenge_response_v0 success_response_v0 tlv_success after_eap_success 4_way_message_2]
+Aug 13, 2025 3:14:04 PM de.learnlib.logging.LearnLogger logPhase
+INFO: Starting round 2
+Aug 13, 2025 3:22:36 PM nl.cypherpunk.statelearner.Learner learn
+INFO: -------------------------------------------------------
+Aug 13, 2025 3:22:36 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Learning [ms]: 31374, (31.374 s)
+Searching for counter-example [ms]: 718062, (718.062 s)
+Total time [ms]: 749528, (749.528 s)
+
+Aug 13, 2025 3:22:36 PM nl.cypherpunk.statelearner.Learner learn
+INFO: Rounds []: 2
+Aug 13, 2025 3:22:36 PM nl.cypherpunk.statelearner.Learner learn
+INFO: States in final hypothesis: 8

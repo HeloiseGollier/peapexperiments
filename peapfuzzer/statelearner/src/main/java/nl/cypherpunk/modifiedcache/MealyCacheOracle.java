@@ -1,0 +1,289 @@
+package nl.cypherpunk.modifiedcache;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+/* Copyright (C) 2013 TU Dortmund
+ * This file is part of LearnLib, http://www.learnlib.de/.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.SimpleFormatter;
+
+import javax.naming.ConfigurationException;
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
+import net.automatalib.commons.util.array.RichArray;
+import net.automatalib.commons.util.comparison.CmpUtil;
+import net.automatalib.commons.util.mappings.Mapping;
+import net.automatalib.incremental.ConflictException;
+import net.automatalib.incremental.mealy.IncrementalMealyBuilder;
+import net.automatalib.incremental.mealy.tree.IncrementalMealyTreeBuilder;
+import net.automatalib.words.Alphabet;
+import net.automatalib.words.Word;
+import net.automatalib.words.WordBuilder;
+import nl.cypherpunk.modifiedcache.dag.*;
+import de.learnlib.api.MembershipOracle;
+import de.learnlib.api.Query;
+import de.learnlib.cache.LearningCacheOracle.MealyLearningCacheOracle;
+import de.learnlib.cache.mealy.MealyCacheConsistencyTest;
+import de.learnlib.logging.LearnLogger;
+import de.learnlib.oracles.DefaultQuery;
+
+import nl.cypherpunk.statelearner.LogOracle;
+import nl.cypherpunk.statelearner.Utils;
+import nl.cypherpunk.statelearner.LogOracle.MealyLogOracle;
+
+/**
+ * Mealy cache. This cache is implemented as a membership oracle: upon
+ * construction, it is provided with a delegate oracle. Queries that can be
+ * answered from the cache are answered directly, others are forwarded to the
+ * delegate oracle. When the delegate oracle has finished processing these
+ * remaining queries, the results are incorporated into the cache.
+ * 
+ * This oracle additionally enables the user to define a Mealy-style
+ * prefix-closure filter: a {@link Mapping} from output symbols to output
+ * symbols may be provided, with the following semantics: If in an output word a
+ * symbol for which the given mapping has a non-null value is encountered, all
+ * symbols <i>after</i> this symbol are replaced by the respective value. The
+ * rationale behind this is that the concrete error message (key in the mapping)
+ * is still reflected in the learned model, it is forced to result in a sink
+ * state with only a single repeating output symbol (value in the mapping).
+ * 
+ * @author Malte Isberner
+ *
+ * @param <I>
+ *            input symbol class
+ * @param <O>
+ *            output symbol class
+ */
+public class MealyCacheOracle<I, O> implements MealyLearningCacheOracle<I, O> {
+
+	private static final class ReverseLexCmp<I> implements Comparator<Query<I, ?>> {
+		private final Alphabet<I> alphabet;
+
+		public ReverseLexCmp(Alphabet<I> alphabet) {
+			this.alphabet = alphabet;
+		}
+
+		@Override
+		public int compare(Query<I, ?> o1, Query<I, ?> o2) {
+			return -CmpUtil.lexCompare(o1.getInput(), o2.getInput(), alphabet);
+		}
+	}
+
+	public static <I, O> MealyCacheOracle<I, O> createDAGCacheOracle(Alphabet<I> inputAlphabet,
+																	 MealyLogOracle<I, O> delegate, Connection dbConn) throws IOException {
+		IncrementalMealyBuilder<I, O> incrementalBuilder = new IncrementalMealyDAGBuilder<>(inputAlphabet);
+		return new MealyCacheOracle<>(incrementalBuilder, delegate, dbConn);
+	}
+
+	private final MealyLogOracle<I, O> delegate;
+	private final IncrementalMealyBuilder<I, O> incMealy;
+	private final Lock incMealyLock;
+	private final Comparator<? super Query<I, ?>> queryCmp;
+	private Connection dbConn;
+	private LearnLogger log;
+
+	public boolean checkingCounterExample;
+
+	public MealyCacheOracle(IncrementalMealyBuilder<I, O> incrementalBuilder,
+			MealyLogOracle<I, O> delegate, Connection dbConn) throws IOException {
+		this(incrementalBuilder, new ReentrantLock(), delegate, dbConn);
+		checkingCounterExample = false;
+	}
+
+	public MealyCacheOracle(IncrementalMealyBuilder<I, O> incrementalBuilder, Lock lock,
+							MealyLogOracle<I, O> delegate, Connection dbConn) throws IOException {
+		this.incMealy = incrementalBuilder;
+		this.incMealyLock = lock;
+		this.queryCmp = new ReverseLexCmp<>(incrementalBuilder.getInputAlphabet());
+		this.delegate = delegate;
+		this.dbConn = dbConn;
+		log = LearnLogger.getLogger("NONDETER");
+        System.out.println("Creating logger");
+
+        FileHandler fileHandler = new FileHandler("./logs/undeterminism.log");
+        fileHandler.setFormatter(new SimpleFormatter());
+
+        log.addHandler(fileHandler);
+        log.setUseParentHandlers(false); // Prevent duplicate console output
+        log.setLevel(Level.ALL);
+	}
+
+	public int getCacheSize() {
+		return incMealy.asGraph().size();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see de.learnlib.cache.LearningCache#createCacheConsistencyTest()
+	 */
+	@Override
+	public MealyCacheConsistencyTest<I, O> createCacheConsistencyTest() {
+		return new MealyCacheConsistencyTest<>(incMealy, incMealyLock);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.learnlib.api.MembershipOracle#processQueries(java.util.Collection)
+	 */
+	@Override
+	public void processQueries(Collection<? extends Query<I, Word<O>>> queries) {
+		if (queries.isEmpty()) {
+			return;
+		}
+
+		RichArray<Query<I, Word<O>>> qrys = new RichArray<>(queries);
+		qrys.parallelSort(queryCmp);
+
+		List<MasterQuery<I, O>> masterQueries = new ArrayList<>();
+
+		Iterator<Query<I, Word<O>>> it = qrys.iterator();
+		Query<I, Word<O>> q = it.next();
+		Word<I> ref = q.getInput();
+
+		incMealyLock.lock();
+		try {
+			MasterQuery<I, O> master = createMasterQuery(ref);
+			if (!master.isAnswered() || checkingCounterExample) {
+				masterQueries.add(master);
+			}
+			master.addSlave(q);
+
+			while (it.hasNext()) {
+				q = it.next();
+				Word<I> curr = q.getInput();
+				if (!curr.isPrefixOf(ref)) {
+					master = createMasterQuery(curr);
+					if (!master.isAnswered() || checkingCounterExample) {
+						masterQueries.add(master);
+					}
+				}
+				master.addSlave(q);
+				// Update ref to increase the effectiveness of the length check in
+				// isPrefixOf
+				ref = curr;
+
+			}
+		} finally {
+			incMealyLock.unlock();
+		}
+
+		incMealyLock.lock();
+		try {
+			for (MasterQuery<I, O> m : masterQueries) {
+				Word<O> output;
+				if (checkingCounterExample) {
+					output = delegate.answerQuery(m.getPrefix(), m.getSuffix(), false);
+				} else {
+					output = delegate.answerQuery(m.getPrefix(), m.getSuffix());
+				}
+				m.answer(output);
+				postProcess(m);
+			}
+		} finally {
+			incMealyLock.unlock();
+		}
+	}
+
+	private void postProcess(MasterQuery<I, O> master) {
+		Word<I> input_suffix = master.getSuffix();
+		Word<O> answer = master.getAnswer();
+		Word<I> input = master.getInput();
+
+		WordBuilder<O> wb = new WordBuilder<>();
+		incMealy.lookup(input, wb);
+		Word<O> modelAnswer = wb.toWord();
+
+		int nbRetries = 0;
+
+		while (answer.asList().contains("tls_bad_cipher_exception") || answer.asList().contains("retransmission")){
+
+			log.info("A tls error has been raised, retrying...");
+			// Retry
+			MasterQuery<I, O> retry = createMasterQuery(input);
+			//Ask query, dont use cache
+			Word<O> output = delegate.answerQuery(Word.epsilon(),retry.getInput(), false);
+			retry.answer(output);
+			answer = retry.getAnswer();
+		}
+
+		while (!modelAnswer.isPrefixOf(answer)) {
+
+			log.info("Found inconsistent response, retrying...");
+
+			// Inconsistent response
+			Word<O> inconsistentResponse = getInconsistentResponse(modelAnswer, answer);
+			String ir = inconsistentResponse.toString();
+			// Inconsistent query
+			String iq = input.subWord(0, inconsistentResponse.length()).toString();
+			// Get current most observed response
+			Word<O> common_response = Utils.cacheLookupQuery(iq, 0, dbConn);
+
+            log.info("Given response: " + ir + " for query " + iq);
+
+			log.info("Common response: " + common_response);
+
+			// Check whether current model is wrong by testing equality between
+			// common_response and ir (inconsistent response)
+			if (common_response.toString().equals(ir) && nbRetries > 3) {
+				// Correct Cache and Restart learning
+				Utils.correctDBcache(iq, ir, dbConn);
+				log.log(Level.INFO, "Deleting all cached queries with inconsisent prefix: " + iq);
+				throw new ConflictException("Failed initial consistency correction, deleted all prefixes");
+			} else {
+				nbRetries ++;
+				// Retry
+				MasterQuery<I, O> retry = createMasterQuery(input);
+				//Ask query, dont use cache
+				Word<O> output = delegate.answerQuery(Word.epsilon(),retry.getInput(), false);
+				retry.answer(output);
+				answer = retry.getAnswer();
+			}
+		}
+		incMealy.insert(input_suffix, answer);
+		delegate.lpPostProcess();
+	}
+
+	private MasterQuery<I, O> createMasterQuery(Word<I> word) {
+		WordBuilder<O> wb = new WordBuilder<>();
+		if (incMealy.lookup(word, wb)) {
+			return new MasterQuery<>(word, wb.toWord());
+		}
+
+		return new MasterQuery<>(word);
+	}
+
+	private Word<O> getInconsistentResponse(Word<O> modelAnswer, Word<O> givenAnswer) {
+		WordBuilder<O> wb = new WordBuilder<>();
+		for (int i=0; i<=modelAnswer.length(); i++) {
+			if (!Objects.equals(modelAnswer.getSymbol(i), givenAnswer.getSymbol(i))) {
+				wb.add(givenAnswer.getSymbol(i));
+				return wb.toWord();
+			} else {
+				wb.add(modelAnswer.getSymbol(i));
+			}
+		}
+		return wb.toWord();
+	}
+}
