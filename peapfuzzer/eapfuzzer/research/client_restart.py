@@ -9,7 +9,7 @@ from config import CONFIG
 
 # wpa_supplicant = 'sudo wpa_supplicant -D nl80211 -i wlan2 -c client.conf'
 wpa_supplicant = 'sudo wpa_supplicant -D nl80211 -i wlan2 -c conffiles/peapv0.conf'
-anonymous_wpa_supplicant = "sudo ./../../../wpa_supplicant-2.10/wpa_supplicant/wpa_supplicant -D nl80211 -i wlan2 -c conffiles/peapv0.conf -dd -K"
+anonymous_wpa_supplicant = "sudo ./../../../wpa_supplicant-2.10/wpa_supplicant/wpa_supplicant -D nl80211 -i wlan2 -c conffiles/peapv0.conf"
 
 iwd = 'sudo iwd -i wlan2'
 ubuntu_off = 'nmcli connection down \"eapfuzzer\"'

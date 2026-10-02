@@ -167,5 +167,18 @@ Then, in a different terminal, we start the harness.
 
 The experiment succeeded if the wpa_supplicant configuration file now contains the line *anonymous_identity="thisisananonymousid"*
 
+Alternatively, you can download wpa_supplicant v2.10, then apply the patch *anonymous_tlv_changes.patch*:
 
+    wget https://w1.fi/releases/wpa_supplicant-2.10.tar.gz
+    tar -xvf wpa_supplicant-2.10.tar.gz
+    cd wpa_supplicant-2.10
+    patch -p1 < ../anonymous_tlv_changes.patch
+    cd wpa_supplicant/
+    make -j 4
+
+Now run wpa_supplicant:
+
+    sudo wpa_supplicant-2.10/wpa_supplicant/wpa_supplicant -D nl80211 -i wlan2 -c peapfuzzer/eapfuzzer/research/conffiles/peapv0.conf
+
+You can also use your own configuration file, but make sure it contains the line "update_config=1", otherwise wpa_supplicant will not update its anonymous identity.
 
