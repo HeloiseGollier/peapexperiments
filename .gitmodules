@@ -1,0 +1,7 @@
+[submodule "eduroamcertsaver"]
+    path = eduroamcertsaver
+    url = git@github.com:HeloiseGollier/eduroamcertsaver.git
+
+[submodule "eduroamcrawler"]
+    path = eduroamcrawler
+    url = git@github.com:HeloiseGollier/eduroamcrawler.git
