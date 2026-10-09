@@ -1,0 +1,110 @@
+diff -ruN '--exclude=.idea' wpa_supplicant-2.10/peapv0.conf anonymouswpasupplicant/peapv0.conf
+--- wpa_supplicant-2.10/peapv0.conf	1970-01-01 01:00:00.000000000 +0100
++++ anonymouswpasupplicant/peapv0.conf	2026-10-09 16:47:27.372624024 +0200
+@@ -0,0 +1,11 @@
++update_config=1
++
++network={
++	ssid="testnetwork"
++	key_mgmt=WPA-EAP
++	scan_freq=2412
++	eap=PEAP
++	identity="user"
++	password="password"
++	openssl_ciphers="eNULL:@SECLEVEL=0"
++}
+diff -ruN '--exclude=.idea' wpa_supplicant-2.10/src/eap_common/eap_tlv_common.h anonymouswpasupplicant/src/eap_common/eap_tlv_common.h
+--- wpa_supplicant-2.10/src/eap_common/eap_tlv_common.h	2026-10-09 17:05:58.455840452 +0200
++++ anonymouswpasupplicant/src/eap_common/eap_tlv_common.h	2026-09-30 16:22:14.180274698 +0200
+@@ -28,6 +28,7 @@
+ #define EAP_TLV_SERVER_TRUSTED_ROOT_TLV 18
+ #define EAP_TLV_REQUEST_ACTION_TLV 19
+ #define EAP_TLV_PKCS7_TLV 20
++#define EAP_TLV_ANONYMOUS_TLV 21
+ 
+ #define EAP_TLV_RESULT_SUCCESS 1
+ #define EAP_TLV_RESULT_FAILURE 2
+@@ -99,6 +100,12 @@
+ 	be16 pac_type;
+ } STRUCT_PACKED;
+ 
++struct eap_tlv_anonymous_tlv {
++	be16 tlv_type;
++	be16 length;
++	be16 identity;
++} STRUCT_PACKED;
++
+ #ifdef _MSC_VER
+ #pragma pack(pop)
+ #endif /* _MSC_VER */
+diff -ruN '--exclude=.idea' wpa_supplicant-2.10/src/eap_peer/eap_peap.c anonymouswpasupplicant/src/eap_peer/eap_peap.c
+--- wpa_supplicant-2.10/src/eap_peer/eap_peap.c	2026-10-09 17:05:58.429840827 +0200
++++ anonymouswpasupplicant/src/eap_peer/eap_peap.c	2026-10-09 17:01:05.630880233 +0200
+@@ -475,8 +475,8 @@
+ {
+ 	size_t left, tlv_len;
+ 	const u8 *pos;
+-	const u8 *result_tlv = NULL, *crypto_tlv = NULL;
+-	size_t result_tlv_len = 0, crypto_tlv_len = 0;
++	const u8 *result_tlv = NULL, *crypto_tlv = NULL, *anonymous_tlv = NULL;
++	size_t result_tlv_len = 0, crypto_tlv_len = 0, anonymous_tlv_len = 0;
+ 	int tlv_type, mandatory;
+ 
+ 	/* Parse TLVs */
+@@ -507,6 +507,14 @@
+ 			crypto_tlv = pos;
+ 			crypto_tlv_len = tlv_len;
+ 			break;
++		case EAP_TLV_ANONYMOUS_TLV:
++			anonymous_tlv = pos;
++			anonymous_tlv_len = tlv_len;
++			wpa_printf(MSG_DEBUG, "EAP-TLV: identified anonymous TLV Type "
++				   "%d%s", tlv_type,
++				   mandatory ? " (mandatory)" : "");
++			break;
++
+ 		default:
+ 			wpa_printf(MSG_DEBUG, "EAP-TLV: Unsupported TLV Type "
+ 				   "%d%s", tlv_type,
+@@ -549,6 +557,29 @@
+ 		return -1;
+ 	}
+ 
++    printf("EAP-PEAP: phase 2 method - %s\n", data->phase2_method->name);
++
++	if (anonymous_tlv && !force_failure) {
++        if (crypto_tlv && !strcmp(data->phase2_method->name, "PWD")) { /* Enforce that a strong PAKE is used with cryptobinding */
++        	wpa_hexdump(MSG_INFO, "EAP-TLV: Anonymous TLV",
++				 anonymous_tlv, anonymous_tlv_len);
++        	eap_set_anon_id(sm, anonymous_tlv, anonymous_tlv_len);
++        } else { /* Otherwise, check the realm */
++			size_t id_len;
++			const u8 *real_id;
++			real_id = eap_get_config_identity(sm, &id_len);
++			if (real_id != NULL){
++				const char *at = strchr(real_id, '@');
++				if (at != NULL && strchr(anonymous_tlv, '@') != NULL) {
++					if (strcmp(at + 1, strchr(anonymous_tlv, '@') + 1) == 0) {
++						eap_set_anon_id(sm, anonymous_tlv, anonymous_tlv_len);
++					}
++				}
++			}
++        }
++
++	}
++
+ 	if (result_tlv) {
+ 		int status, resp_status;
+ 		wpa_hexdump(MSG_DEBUG, "EAP-TLV: Result TLV",
+diff -ruN '--exclude=.idea' wpa_supplicant-2.10/wpa_supplicant/wpas_glue.c anonymouswpasupplicant/wpa_supplicant/wpas_glue.c
+--- wpa_supplicant-2.10/wpa_supplicant/wpas_glue.c	2026-10-09 17:05:58.343842069 +0200
++++ anonymouswpasupplicant/wpa_supplicant/wpas_glue.c	2022-01-16 21:51:29.000000000 +0100
+@@ -303,7 +303,7 @@
+ 		 * timeout if the AP does not disconnect in case of
+ 		 * authentication failure.
+ 		 */
+-		wpa_supplicant_req_auth_timeout(wpa_s, 0, 0);
++		wpa_supplicant_req_auth_timeout(wpa_s, 2, 0);
+ 	} else {
+ 		ieee802_1x_notify_create_actor(wpa_s, wpa_s->last_eapol_src);
+ 	}

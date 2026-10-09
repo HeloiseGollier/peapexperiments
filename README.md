@@ -131,39 +131,30 @@ Specific parameters can be changed in research/harness.properties.
 
 We perform a modified PEAP handshake using our test harness. Then connect your client using username 'user' and password 'password'
 
-    cd peapfuzzer/eapfuzzer/research
-    sudo su
-    source venv/bin/activate
-    ./testing.py
-
-Then, in a different terminal, we start the harness.
-
-    cd peapfuzzer/eapfuzzer/research
-    sudo su
-    source venv/bin/activate
-    ./test_harness.py
+    cd anonymous_tlv/hostapd-2.11/hostapd
+    make -j 4
+    cd ../..
+    sudo ./hostapd-2.11/hostapd/hostapd hostapd.conf
 
 The experiment succeeded if the client is willing to perform the 4-way handshake.
 
 **Experiment:** Testing that we can modify wpa_supplicant to process the optional anonymous identity TLV. 
 First, we compile the modified version of wpa_supplicant.
     
-    cd anonymouswpasupplicant/wpasupplicant
+    cd anonymous_tlv/anonymouswpasupplicant/wpasupplicant
     make -j 4
+    cd ..
+    sudo ./wpa_supplicant/wpa_supplicant -D nl80211 -i wlan2 -c peapv0.conf
 
-We perform a modified PEAP handshake using our test harness and client from the previous experiment.
 
-    cd peapfuzzer/eapfuzzer/research
-    sudo su
-    source venv/bin/activate
-    ./testing.py
 
-Then, in a different terminal, we start the harness.
+Finally, in a different terminal, we start a modified version of hostapd which will send the anonymous identity TLV.
 
-    cd peapfuzzer/eapfuzzer/research
-    sudo su
-    source venv/bin/activate
-    ./test_harness.py
+    cd hostapd-2.11/hostapd
+    make -j 4
+    cd ../..
+    sudo ./hostapd-2.11/hostapd/hostapd hostapd.conf
+
 
 The experiment succeeded if the wpa_supplicant configuration file now contains the line *anonymous_identity="thisisananonymousid"*
 
@@ -172,13 +163,13 @@ Alternatively, you can download wpa_supplicant v2.10, then apply the patch *anon
     wget https://w1.fi/releases/wpa_supplicant-2.10.tar.gz
     tar -xvf wpa_supplicant-2.10.tar.gz
     cd wpa_supplicant-2.10
-    patch -p1 < ../anonymous_tlv_changes.patch
+    patch -p1 < ../anonymous_tlv/anonymous_tlv_changes.patch
     cd wpa_supplicant/
     make -j 4
 
 Now run wpa_supplicant:
 
-    sudo wpa_supplicant-2.10/wpa_supplicant/wpa_supplicant -D nl80211 -i wlan2 -c peapfuzzer/eapfuzzer/research/conffiles/peapv0.conf
+    sudo wpa_supplicant-2.10/wpa_supplicant/wpa_supplicant -D nl80211 -i wlan2 -c anonymous_tlv/anonymouswpasupplicant/peapv0.conf
 
 You can also use your own configuration file, but make sure it contains the line "update_config=1", otherwise wpa_supplicant will not update its anonymous identity.
 
